@@ -1,0 +1,1 @@
+[{"model": "foodwaste.dish", "pk": 1, "fields": {"name": "rice"}}, {"model": "foodwaste.dish", "pk": 2, "fields": {"name": "mushed potato"}}, {"model": "foodwaste.dish", "pk": 3, "fields": {"name": "beans"}}, {"model": "foodwaste.dish", "pk": 4, "fields": {"name": "meat"}}, {"model": "foodwaste.dish", "pk": 5, "fields": {"name": "chicken"}}]
