@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Submissions</title>
+  <link rel="stylesheet" href="{% static 'css/ysa_style.css' %}">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center">All Food Entries</h2>
+    <table class="table table-bordered text-center align-middle" style="border-collapse: collapse; border: 2px solid #333;">
+        <thead style="background-color: #333; color: white;">
+          <tr>
+            <th style="border: 1px solid #333;">Dish</th>
+            <th style="border: 1px solid #333;">Waste</th>
+            <th style="border: 1px solid #333;">Rating</th>
+            <th style="border: 1px solid #333;">Reason</th>
+            <th style="border: 1px solid #333;">Comment</th>
+            <th style="border: 1px solid #333;">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr>
+            <td style="border: 1px solid #333;">{{ entry.dish.name }}</td>
+            <td style="border: 1px solid #333;">{{ entry.waste_amount }}</td>
+            <td style="border: 1px solid #333;">{{ entry.rating }}</td>
+            <td style="border: 1px solid #333; max-width: 200px; word-wrap: break-word;">{{ entry.waste_reason }}</td>
+            <td style="border: 1px solid #333; max-width: 200px; word-wrap: break-word;">{{ entry.comments }}</td>
+            <td style="border: 1px solid #333;">{{ entry.date|date:"F j, Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      
+  </div>
+</body>
+</html>
