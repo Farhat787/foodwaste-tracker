@@ -62,7 +62,10 @@ WSGI_APPLICATION = 'foodwaste_project.wsgi.application'
 
 # ✅ PostgreSQL database via DATABASE_URL (set in Render or .env)
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+    )
 }
 
 # Static files for Render (WhiteNoise)
