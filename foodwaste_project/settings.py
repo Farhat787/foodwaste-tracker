@@ -11,7 +11,7 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING
-SECRET_KEY = env('SECRET_KEY', default='your-fallback-secret-key')
+SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env.bool('DEBUG', default=False)
 
@@ -63,7 +63,7 @@ WSGI_APPLICATION = 'foodwaste_project.wsgi.application'
 # ✅ PostgreSQL database via DATABASE_URL (set in Render or .env)
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
+        default=env('DATABASE_URL'),
         conn_max_age=600,
     )
 }
