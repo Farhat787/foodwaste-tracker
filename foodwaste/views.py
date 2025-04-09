@@ -1,68 +1,77 @@
 from django.shortcuts import render, redirect
 from .forms import FoodEntryForm
-from .models import FoodEntry, Dish, DishReport
+from .models import FoodEntry, DishWaste
 from django.contrib import messages
-from django.db.models import Avg, Sum
 from collections import defaultdict
-import json  
+
 
 def home_view(request):
     return render(request, 'foodwaste/home.html')
+
 
 def food_entry_view(request):
     if request.method == 'POST':
         form = FoodEntryForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Thanks! Your food entry has been submitted.")
-            return redirect('home')  # 👈 Redirect to homepage
+            food_entry = form.save()
+
+            # Clear any existing dish waste data
+            DishWaste.objects.filter(food_entry=food_entry).delete()
+
+            for dish in form.cleaned_data['dishes']:
+                waste_key = f"waste_percentage_{dish.id}"
+                rating_key = f"dish_{dish.id}_rating"
+
+                waste_val = int(request.POST.get(waste_key, 0))
+                rating_val = int(request.POST.get(rating_key, 0))
+
+                DishWaste.objects.create(
+                    food_entry=food_entry,
+                    dish=dish,
+                    waste_percentage=waste_val,
+                    rating=rating_val
+                )
+
+            messages.success(request, "Thank you! Your submission has been recorded.")
+            return redirect('home')
     else:
         form = FoodEntryForm()
 
     return render(request, 'foodwaste/food_entry.html', {'form': form})
 
-WASTE_MAP = {
-    'None': 0,
-    'Some': 1,
-    'Lot': 2,
-}
 
 def report_view(request):
-    entries = FoodEntry.objects.all()
-    report_data = defaultdict(lambda: {"total_waste": 0, "ratings": [], "count": 0})
+    dish_stats = defaultdict(lambda: {"total_waste": 0, "num_entries": 0, "ratings": []})
 
-    for entry in entries:
-        dish_name = entry.dish.name.capitalize()
-        waste_value = WASTE_MAP.get(entry.waste_amount, 0)
-        report_data[dish_name]["total_waste"] += waste_value
-        report_data[dish_name]["ratings"].append(entry.rating)
-        report_data[dish_name]["count"] += 1
+    all_entries = FoodEntry.objects.prefetch_related('dishes', 'dish_wastes')
 
+    for entry in all_entries:
+        for dish_waste in entry.dish_wastes.all():
+            dish_name = dish_waste.dish.name.capitalize()
+            dish_stats[dish_name]["total_waste"] += dish_waste.waste_percentage
+            dish_stats[dish_name]["num_entries"] += 1
+            dish_stats[dish_name]["ratings"].append(dish_waste.rating)
+
+    # Format the report
     formatted_report = []
-    for dish, data in report_data.items():
+    for dish, data in dish_stats.items():
+        num_entries = data["num_entries"]
+        avg_waste = round(data["total_waste"] / num_entries, 1) if num_entries else 0
+
         ratings = data["ratings"]
         avg_rating = round(sum(ratings) / len(ratings), 1) if ratings else 0
-        waste_pct = round((data["total_waste"] / (2 * data["count"])) * 100) if data["count"] > 0 else 0
 
         formatted_report.append({
             "dish": dish,
-            "total_waste": waste_pct,
             "average_rating": avg_rating,
+            "total_waste": avg_waste
         })
 
     formatted_report.sort(key=lambda x: x["average_rating"], reverse=True)
 
-    return render(request, "foodwaste/report.html", {
-        "report_data": formatted_report,
-        "report_data_json": json.dumps(formatted_report)  # 👈 JSON for JS
-    })
+    return render(request, "foodwaste/report.html", {"report_data": formatted_report})
 
 
 def full_report_view(request):
-    entries = FoodEntry.objects.all().order_by('-date')  # 👈 fixed here
+    entries = FoodEntry.objects.all().order_by('-date')
     return render(request, "foodwaste/full_report.html", {"entries": entries})
-
-
-
-
-

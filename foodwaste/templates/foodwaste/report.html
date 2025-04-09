@@ -52,7 +52,7 @@
           <thead>
             <tr>
               <th>🍽 Dish</th>
-              <th>🗑 Waste (%)</th>
+              <th>🗑 Avg. Waste %</th>
               <th>⭐ Avg. Rating</th>
             </tr>
           </thead>
@@ -68,8 +68,10 @@
         </table>
       </div>
 
-      <h5 class="text-center">🗑 Waste Percentage by Dish</h5>
-      <canvas id="wasteChart" height="120"></canvas>
+      <div class="mt-5">
+        <h5 class="text-center">📊 Average Waste % by Dish</h5>
+        <canvas id="wasteChart" height="150"></canvas>
+      </div>
     {% else %}
       <p class="text-center">No data available yet. Please submit your food entries.</p>
     {% endif %}
@@ -84,41 +86,42 @@
     <div>FOOD WASTE TRACKER</div>
   </div>
 
+  {{ report_data|json_script:"report-data" }}
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script id="report-data" type="application/json">
-    {{ report_data_json|safe }}
-  </script>
+<script>
+  const reportData = JSON.parse(document.getElementById("report-data").textContent);
+  const dishLabels = reportData.map(item => item.dish);
+  const avgWaste = reportData.map(item => item.total_waste);
 
-  <script>
-    const reportData = JSON.parse(document.getElementById('report-data').textContent);
-
-    const dishNames = reportData.map(item => item.dish);
-    const wastePercentages = reportData.map(item => item.total_waste);
-
-    const wasteCtx = document.getElementById('wasteChart').getContext('2d');
-
-    new Chart(wasteCtx, {
-      type: 'bar',
-      data: {
-        labels: dishNames,
-        datasets: [{
-          label: 'Waste %',
-          data: wastePercentages,
-          backgroundColor: '#ff5c77'
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            title: { display: true, text: "Waste (%)" }
+  const ctx = document.getElementById('wasteChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dishLabels,
+      datasets: [{
+        label: 'Average Waste %',
+        data: avgWaste,
+        backgroundColor: '#ff5c77',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Waste (%)'
           }
         }
       }
-    });
-  </script>
+    }
+  });
+</script>
+
+
 </body>
 </html>
-
-
