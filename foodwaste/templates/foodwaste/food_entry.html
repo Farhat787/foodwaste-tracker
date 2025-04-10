@@ -2,8 +2,6 @@
 <html lang="en">
 <head>
   {% load static %}
-  {% load form_tags %}
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Food Waste Entry</title>
@@ -79,13 +77,10 @@
         </div>
 
         <!-- Waste reason -->
-        <div class="mb-3" id="waste-reason-section" style="display: none;">
-          <label for="{{ form.waste_reason.id_for_label }}" class="form-label">
-            💭 <strong>Why did you waste food?</strong>
-          </label>
-          {{ form.waste_reason|add_class:"form-control" }}
+        <div class="mb-3">
+          <label for="id_waste_reason">💭 Why did you waste food?</label>
+          {{ form.waste_reason }}
         </div>
-        
 
         <!-- Comments -->
         <div class="mb-3">
