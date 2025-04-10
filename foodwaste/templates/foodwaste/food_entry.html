@@ -77,9 +77,18 @@
         </div>
 
         <!-- Waste reason -->
-        <div class="mb-3">
-          <label for="id_waste_reason">💭 Why did you waste food?</label>
-          {{ form.waste_reason }}
+        <div class="mb-3" id="waste-reason-section" style="display: none;">
+          <label for="id_waste_reason" class="form-label d-block">
+            💭 <strong>Why did you waste food?</strong>
+          </label>
+          <textarea id="id_waste_reason"
+                    name="waste_reason"
+                    class="form-control"
+                    placeholder="Explain why you wasted food (if applicable)"
+                    rows="3"
+                    style="border-radius: 10px;">
+            {{ form.waste_reason.value|default_if_none:"" }}
+          </textarea>
         </div>
 
         <!-- Comments -->
