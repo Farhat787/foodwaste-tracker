@@ -173,11 +173,22 @@
           }
         });
 
-        wasteSection.style.display = anyChecked ? 'block' : 'none';
+        let showReason = false;
+        const selects = wasteInputsDiv.querySelectorAll('select');
+        selects.forEach(select => {
+          if (parseInt(select.value) > 0) {
+            showReason = true;
+          }
+        });
+        wasteSection.style.display = showReason ? 'block' : 'none';
+
       }
 
       dishInputs.forEach(input => input.addEventListener('change', updateWasteInputs));
       updateWasteInputs();
+
+      wasteInputsDiv.addEventListener('change', updateWasteInputs);
+
     });
   </script>
 </body>
